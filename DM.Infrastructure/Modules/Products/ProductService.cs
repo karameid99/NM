@@ -102,6 +102,8 @@ namespace DM.Infrastructure.Modules.Product
                 {
                     Id = c.Id,
                     Name = c.Name,
+                    Description = c.Description,
+                    LogoPath = c.LogoPath,
                     ProductNo = c.ProductNo
                 }).ToListAsync();
         }

@@ -19,9 +19,13 @@ namespace NM.API
             CreateMap<DMUser, UserDto>();
             CreateMap<CreateUserDto, DMUser>();
 
-            CreateMap<Product, CreateProductDto>();
-            CreateMap<Shelf, CreateShelfDto>();
-            CreateMap<Exhibition, CreateExhibitionDto>();
+            CreateMap<Product, CreateProductDto>().ReverseMap();
+            CreateMap<Shelf, CreateShelfDto>().ReverseMap();
+            CreateMap<Exhibition, CreateExhibitionDto>().ReverseMap();
+
+            CreateMap<Product, ProductDto>().ReverseMap();
+            CreateMap<Shelf, ShelfDto>().ReverseMap();
+            CreateMap<Exhibition, ExhibitionDto>().ReverseMap();
         }
     }
 }

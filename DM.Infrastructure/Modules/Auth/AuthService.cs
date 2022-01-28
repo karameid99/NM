@@ -147,7 +147,7 @@ namespace DM.Infrastructure.Modules.Auth
             var accessToken = new JwtSecurityToken(_configuration["Jwt:Issuer"],
                 _configuration["Jwt:Issuer"],
                 claims,
-                expires: DateTime.Now.AddYears(50),
+                expires: DateTime.Now.AddDays(1),
                 signingCredentials: creds);
             var token = new JwtSecurityTokenHandler().WriteToken(accessToken);
             return token;

@@ -1,3 +1,4 @@
+using DM.Core.DTOs.General;
 using DM.Core.Entities.Auth;
 using DM.Infrastructure.Modules.Auth;
 using DM.Infrastructure.Modules.Exhibition;
@@ -47,6 +48,8 @@ namespace NM.API
                 options.Password.RequireUppercase = false;
                 options.SignIn.RequireConfirmedEmail = false;
             }).AddEntityFrameworkStores<DMDbContext>();
+            services.Configure<ImageSettings>(Configuration.GetSection("ImageSettings"));
+
             services.AddControllers(); 
 
             services.AddTransient<IAuthService, AuthService>();
@@ -68,7 +71,7 @@ namespace NM.API
                   {
                       ValidateIssuer = true,
                       ValidateAudience = true,
-                      ValidateLifetime = true,
+                      ValidateLifetime = false,
                       ValidateIssuerSigningKey = true,
                       ValidIssuer = Configuration["Jwt:Issuer"],
                       ValidAudience = Configuration["Jwt:Issuer"],

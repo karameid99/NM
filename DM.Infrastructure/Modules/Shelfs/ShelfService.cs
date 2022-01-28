@@ -34,9 +34,9 @@ namespace DM.Infrastructure.Modules.Shelf
         {
             var Shelf = await _context.Shelfs.FirstOrDefaultAsync(x => x.Id == id);
             if (Shelf == null)
-                throw new DMException("Shelfs does't exists");
+                throw new DMException("Shelf does't exists");
             if (Shelf.IsDelete)
-                throw new DMException("Shelfs already deleted");
+                throw new DMException("Shelf already deleted");
 
             Shelf.IsDelete = true;
             _context.Shelfs.Update(Shelf);
@@ -48,9 +48,9 @@ namespace DM.Infrastructure.Modules.Shelf
         {
             var Shelf = await _context.Shelfs.FirstOrDefaultAsync(x => x.Id == id);
             if (Shelf == null)
-                throw new DMException("Shelfs does't exists");
+                throw new DMException("Shelf does't exists");
             if (Shelf.IsDelete)
-                throw new DMException("Shelfs already deleted");
+                throw new DMException("Shelf already deleted");
             return _mapper.Map<ShelfDto>(Shelf);
         }
 
@@ -58,7 +58,7 @@ namespace DM.Infrastructure.Modules.Shelf
         public async Task<List<ListItemDto>> List(int exhibitionId)
         {
             return await _context.Shelfs
-                    .Where(x => !x.IsDelete && x.ExhibitionId == exhibitionId)
+                    .Where(x => !x.IsDelete && x.Exhibition.Type == Core.Enums.ExhibitionType.Exhibition && x.ExhibitionId == exhibitionId)
                     .Select(c => new ListItemDto
                     {
                         Id = c.Id,
@@ -71,10 +71,10 @@ namespace DM.Infrastructure.Modules.Shelf
         {
             var Shelf = await _context.Shelfs.FirstOrDefaultAsync(x => x.Id == dto.Id);
             if (Shelf == null)
-                throw new DMException("Shelfs does't exists");
+                throw new DMException("Shelf does't exists");
             if (Shelf.IsDelete)
-                throw new DMException("Shelfs already deleted");
-
+                throw new DMException("Shelf already deleted");
+             
             Shelf.Name = dto.Name;
             Shelf.ShelfNo = dto.ShelfNo;
             Shelf.ExhibitionId = dto.ExhibitionId;
@@ -88,7 +88,7 @@ namespace DM.Infrastructure.Modules.Shelf
             var skipValue = (dto.Page - 1) * dto.PerPage;
 
             return await _context.Shelfs
-                .Where(x => !x.IsDelete 
+                .Where(x => !x.IsDelete && x.Exhibition.Type == Core.Enums.ExhibitionType.Exhibition
                 && (string.IsNullOrEmpty(dto.SearchKey)
                 || x.Name.Contains(dto.SearchKey)))
                 .Skip(skipValue).Take(dto.PerPage)
