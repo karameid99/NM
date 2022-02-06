@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using NM.API.Filters;
 using NM.Data.Data;
 using System.Collections.Generic;
 using System.Text;
@@ -50,8 +51,11 @@ namespace NM.API
             }).AddEntityFrameworkStores<DMDbContext>();
             services.Configure<ImageSettings>(Configuration.GetSection("ImageSettings"));
 
-            services.AddControllers(); 
-
+            services.AddControllers();
+            services.AddMvc(options =>
+            {
+                options.Filters.Add(typeof(ValidateModelAttribute));
+            });
             services.AddTransient<IAuthService, AuthService>();
             services.AddSingleton<IImageService, ImageService>();
             services.AddScoped<IExhibitionService, ExhibitionService>();

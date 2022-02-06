@@ -70,7 +70,7 @@ namespace DM.Infrastructure.Modules.Product
                         Name = c.Name,
                     }).ToListAsync();
         }
-
+         
 
         public async Task Update(UpdateProductDto dto, string userId)
         {
@@ -88,7 +88,6 @@ namespace DM.Infrastructure.Modules.Product
             _context.Products.Update(Product);
             await _context.SaveChangesAsync();
         }
-
         public async Task<List<ProductDto>> GetAll(GetAllProductsDto dto)
         {
             var skipValue = (dto.Page - 1) * dto.PerPage;

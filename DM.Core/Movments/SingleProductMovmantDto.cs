@@ -9,8 +9,7 @@ namespace DM.Core.Movments
 {
     public class SingleProductMovmantDto
     {
-        public int? Id { get; set; }
-        public int ProductId { get; set; }
+        public int Id { get; set; }
         public int ShelfId { get; set; }
         public int Quantity { get; set; }
         public MovmentActionType MovmentActionType { get; set; }
