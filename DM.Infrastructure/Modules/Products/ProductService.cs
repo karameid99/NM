@@ -74,7 +74,7 @@ namespace DM.Infrastructure.Modules.Product
 
         public async Task Update(UpdateProductDto dto, string userId)
         {
-            var Product = await _context.Products.FirstOrDefaultAsync(x => x.Id == dto.Id);
+            var Product = await _context.Products.FirstOrDefaultAsync(x => x.Id.ToString() == dto.Id);
             if (Product == null)
                 throw new DMException("Products does't exists");
             if (Product.IsDelete)
@@ -95,7 +95,7 @@ namespace DM.Infrastructure.Modules.Product
             return await _context.Products
                 .Where(x => !x.IsDelete 
                 && (string.IsNullOrEmpty(dto.SearchKey)
-                || x.Name.Contains(dto.SearchKey)))
+                || x.ProductNo.Contains(dto.SearchKey)))
                 .Skip(skipValue).Take(dto.PerPage)
                 .Select(c => new ProductDto
                 {

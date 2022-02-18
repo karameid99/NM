@@ -10,7 +10,6 @@ namespace DM.Core.DTOs.Products
 {
    public class CreateProductDto
     {
-        [Required]
         public string Name { get; set; }
         [Required]
         public string ProductNo { get; set; }
@@ -19,6 +18,6 @@ namespace DM.Core.DTOs.Products
     }
     public class UpdateProductDto : CreateProductDto
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
     }
 }

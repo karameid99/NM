@@ -54,6 +54,12 @@ namespace NM.API.Controllers
             var res = await _MovmentService.GetProductHistory(dto);
             return GetResponse(res);
         }
-       
+        [HttpGet]
+        public async Task<IActionResult> GetDashborad()
+        {
+            var res = await _MovmentService.GetDashborad();
+            return GetResponse(res);
+        }
+
     }
 }

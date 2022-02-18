@@ -15,5 +15,6 @@ namespace DM.Infrastructure.Modules.Movments
         Task<List<ProductExhibitionDto>> GetProductDamaged(GetProductDamagedDto dto);
         Task<List<ProductExhibitionDto>> GetProductFinished(GetProductFinishedDto dto);
         Task<List<ProductHistoryDto>> GetProductHistory(GetProductHistoryDto dto);
+        Task<GetDashboradDto> GetDashborad();
     }
 }

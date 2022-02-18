@@ -195,6 +195,19 @@ namespace DM.Infrastructure.Modules.Movments
         {
             return await GetProductExhibition(new GetProductExhibitionDto { Page = dto.Page, PerPage = dto.PerPage, SearchKey = dto.SearchKey }, true);
         }
+
+        public async Task<GetDashboradDto> GetDashborad()
+        {
+            return new GetDashboradDto
+            {
+                CurrentProducts = await _context.Products.CountAsync(x => !x.IsDelete),
+                DamagedProducts = await _context.ShelfProducts.Where(x => !x.IsDelete && x.Shelf.Exhibition.Type == ExhibitionType.Damaged).CountAsync(),
+                Exhibitions = await _context.Exhibitions.CountAsync(x => x.Type == ExhibitionType.Exhibition && !x.IsDelete),
+                Users = await _context.Users.CountAsync(x => !x.IsDelete && x.UserType == UserType.Supervisor),
+                FinishedProducts = await _context.ShelfProducts.Where(x => !x.IsDelete && x.Quantity == 0).CountAsync(),
+                StoreProducts = await _context.ShelfProducts.Where(x => !x.IsDelete && x.Shelf.Exhibition.Type == ExhibitionType.Store).CountAsync(),
+            };
+        }
         #endregion
     }
 }
