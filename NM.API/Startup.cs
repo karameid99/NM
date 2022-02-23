@@ -52,10 +52,10 @@ namespace NM.API
             services.Configure<ImageSettings>(Configuration.GetSection("ImageSettings"));
 
             services.AddControllers();
-            services.AddMvc(options =>
-            {
-                options.Filters.Add(typeof(ValidateModelAttribute));
-            });
+            //services.AddMvc(options =>
+            //{
+            //    options.Filters.Add(typeof(ValidateModelAttribute));
+            //});
             services.AddTransient<IAuthService, AuthService>();
             services.AddSingleton<IImageService, ImageService>();
             services.AddScoped<IExhibitionService, ExhibitionService>();

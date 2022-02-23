@@ -4,10 +4,14 @@ using DM.Core.Enums;
 using DM.Core.Exceptions;
 using DM.Core.Movments;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Reporting.NETCore;
 using NM.Data.Data;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace DM.Infrastructure.Modules.Movments
@@ -35,7 +39,7 @@ namespace DM.Infrastructure.Modules.Movments
                     await SingleNormalMovmentType(dto.ShelfId, dto.Quantity, dto.Id, userId, null);
                     break;
                 case MovmentActionType.MoveToStore:
-                    await SingleMoveToStoreMovmentType(dto.Quantity, dto.Id, userId);
+                    await SingleAddedMovmentType(dto.Id, dto.ShelfId, dto.Quantity, userId);
                     break;
                 case MovmentActionType.MoveToDamage:
                     await SingleMoveToDamageMovmentType(dto.Quantity, dto.Id, userId);
@@ -111,12 +115,6 @@ namespace DM.Infrastructure.Modules.Movments
             await AddSingleProuctHistory(currentShelfId, movmentType, OldShelfQuantity, -quantity, userId, newShelfProduct.Id);
             await _context.SaveChangesAsync();
         }
-        private async Task SingleMoveToStoreMovmentType(int quantity, int currentShelfId, string userId)
-        {
-            var shelfProduct = await _context.ShelfProducts.FirstOrDefaultAsync(x => x.Shelf.Exhibition.Type == Core.Enums.ExhibitionType.Store);
-            var ShelfId = shelfProduct != null ? shelfProduct.ShelfId : await _context.Shelfs.Where(x => x.Exhibition.Type == Core.Enums.ExhibitionType.Store).Select(x => x.Id).FirstOrDefaultAsync();
-            await SingleNormalMovmentType(ShelfId, quantity, currentShelfId, userId, MovmentType.MoveToStore);
-        }
         private async Task SingleMoveToDamageMovmentType(int quantity, int currentShelfId, string userId)
         {
             var shelfProduct = await _context.ShelfProducts.FirstOrDefaultAsync(x => x.Shelf.Exhibition.Type == Core.Enums.ExhibitionType.Damaged);
@@ -171,6 +169,26 @@ namespace DM.Infrastructure.Modules.Movments
             var exhibition = await _context.Exhibitions.FirstOrDefaultAsync(x => x.Type == Core.Enums.ExhibitionType.Damaged);
             return await GetProductExhibition(new GetProductExhibitionDto { ExhibitionId = exhibition.Id, Page = dto.Page, PerPage = dto.PerPage, SearchKey = dto.SearchKey });
         }
+        public async Task<byte[]> GetRdlcPdfPackageAsBinaryDataAsync(string reportPath, int id, string name, List<ProductHistoryReportDto> products)
+        {
+            var productShelfId = await _context.ProductHistories.Include(c => c.NewShelfProduct).Where(x => x.NewShelfProductId == id).Select(x => x.NewShelfProductId).FirstOrDefaultAsync();
+            var product = await _context.ShelfProducts.Include(c => c.Product).Where(x => x.Id == productShelfId).Select(x => x.Product).FirstOrDefaultAsync();
+            reportPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + reportPath;
+            LocalReport report = new LocalReport();
+            report.ReportPath = reportPath;
+            ReportParameter[] param = new ReportParameter[3];
+
+            param[0] = new ReportParameter("ProductNumber", product.ProductNo);
+            param[1] = new ReportParameter("ProductName", product.Name);
+            param[2] = new ReportParameter("ProductDescription", product.Description);
+
+            report.SetParameters(param);
+
+            report.DataSources.Add(new ReportDataSource(name, products));
+
+            return report.Render("PDF");
+
+        }
         public async Task<List<ProductHistoryDto>> GetProductHistory(GetProductHistoryDto dto)
         {
             var skipValue = (dto.Page - 1) * dto.PerPage;
@@ -195,7 +213,27 @@ namespace DM.Infrastructure.Modules.Movments
         {
             return await GetProductExhibition(new GetProductExhibitionDto { Page = dto.Page, PerPage = dto.PerPage, SearchKey = dto.SearchKey }, true);
         }
+        public async Task<List<ProductHistoryReportDto>> GetallProductHistory(int id)
+        {
+            return await _context.ProductHistories
+                .Where(x=> x.NewShelfProductId == id)
+                .Include(x => x.NewShelfProduct)
+                .ThenInclude(x => x.Shelf)
+                .Include(x => x.OldShelfProduct)
+                .ThenInclude(x => x.Shelf)
+                 .Select(c => new ProductHistoryReportDto
+                 {
+                     FullName = c.UserFullName,
+                     ActionDate = c.CreatedAt.Value.ToString("dd/MM/yyyy mm:hh"),
+                     ToShelf = c.NewShelfProduct.Shelf.Name,
+                     FromShelf = c.OldShelfProduct != null ? c.OldShelfProduct.Shelf.Name : "---",
+                     NewQantity = c.NewQuantity,
+                     OldQuantity = c.OldQuantity,
+                     Deferance = c.AddedQuantity,
+                     MovmantType = c.MovmentType.ToString(),
 
+                 }).ToListAsync();
+        }
         public async Task<GetDashboradDto> GetDashborad()
         {
             return new GetDashboradDto
@@ -205,7 +243,7 @@ namespace DM.Infrastructure.Modules.Movments
                 Exhibitions = await _context.Exhibitions.CountAsync(x => x.Type == ExhibitionType.Exhibition && !x.IsDelete),
                 Users = await _context.Users.CountAsync(x => !x.IsDelete && x.UserType == UserType.Supervisor),
                 FinishedProducts = await _context.ShelfProducts.Where(x => !x.IsDelete && x.Quantity == 0).CountAsync(),
-                StoreProducts = await _context.ShelfProducts.Where(x => !x.IsDelete && x.Shelf.Exhibition.Type == ExhibitionType.Store).CountAsync(),
+                StoreProducts = await _context.Exhibitions.Where(x => !x.IsDelete && x.Type == ExhibitionType.Store).CountAsync(),
             };
         }
         #endregion

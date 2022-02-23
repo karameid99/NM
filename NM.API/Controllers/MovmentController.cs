@@ -1,6 +1,7 @@
 ﻿using DM.Core.Movments;
 using DM.Infrastructure.Modules.Movments;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections;
 using System.Threading.Tasks;
 
 namespace NM.API.Controllers
@@ -35,12 +36,6 @@ namespace NM.API.Controllers
             return GetResponse(res);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetProductStore([FromQuery] GetProductStoreDto dto)
-        {
-            var res = await _MovmentService.GetProductStore(dto);
-            return GetResponse(res);
-        }
         [HttpPost]
         public async Task<IActionResult> SingleProductMovmant([FromBody] SingleProductMovmantDto dto)
         {
@@ -59,6 +54,22 @@ namespace NM.API.Controllers
         {
             var res = await _MovmentService.GetDashborad();
             return GetResponse(res);
+        }
+        [HttpGet]
+        public async Task<IActionResult> Print(int id) 
+        {
+            var reportPath = "/Module/Movment/Reports/Invoice.rdlc";
+
+            ArrayList data = new ArrayList();
+            ArrayList data1 = new ArrayList();
+
+            data.Add("ProductHistory");
+
+            data1.Add(await _MovmentService.GetallProductHistory(id));
+
+           var file =  await _MovmentService.GetRdlcPdfPackageAsBinaryDataAsync(reportPath,id, "ProductHistory", await _MovmentService.GetallProductHistory(id));
+
+            return File(file, "Application/pdf");
         }
 
     }

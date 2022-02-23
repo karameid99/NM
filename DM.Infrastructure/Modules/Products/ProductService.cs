@@ -2,7 +2,9 @@
 using DM.Core.DTOs.General;
 using DM.Core.DTOs.Products;
 using DM.Core.Exceptions;
+using DM.Core.Movments;
 using DM.Infrastructure.Modules.Image;
+using DM.Infrastructure.Modules.Movments;
 using Microsoft.EntityFrameworkCore;
 using NM.Data.Data;
 using System.Collections.Generic;
@@ -16,11 +18,13 @@ namespace DM.Infrastructure.Modules.Product
         private readonly DMDbContext _context;
         private readonly IMapper _mapper;
         private readonly IImageService _imageService;
-        public ProductService(DMDbContext context, IMapper napper, IImageService imageService)
+        private readonly IMovmentService _movmentService;
+        public ProductService(DMDbContext context, IMapper napper, IImageService imageService, IMovmentService movmentService)
         {
             _context = context;
             _mapper = napper;
             _imageService = imageService;
+            _movmentService = movmentService;
         }
 
         public async Task Create(CreateProductDto dto, string userId)
@@ -31,6 +35,15 @@ namespace DM.Infrastructure.Modules.Product
 
             await _context.Products.AddAsync(Product);
             await _context.SaveChangesAsync();
+
+            var movmentDto = new SingleProductMovmantDto
+            {
+                Id = Product.Id,
+                ShelfId = dto.ShelfId,
+                Quantity = dto.Quantity,
+                MovmentActionType = Core.Enums.MovmentActionType.AddMovemnt
+            };
+            await _movmentService.SingleProductMovmant(movmentDto, userId);
         }
 
 
@@ -70,7 +83,7 @@ namespace DM.Infrastructure.Modules.Product
                         Name = c.Name,
                     }).ToListAsync();
         }
-         
+
 
         public async Task Update(UpdateProductDto dto, string userId)
         {
@@ -93,7 +106,7 @@ namespace DM.Infrastructure.Modules.Product
             var skipValue = (dto.Page - 1) * dto.PerPage;
 
             return await _context.Products
-                .Where(x => !x.IsDelete 
+                .Where(x => !x.IsDelete
                 && (string.IsNullOrEmpty(dto.SearchKey)
                 || x.ProductNo.Contains(dto.SearchKey)))
                 .Skip(skipValue).Take(dto.PerPage)

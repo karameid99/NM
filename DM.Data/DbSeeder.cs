@@ -26,7 +26,6 @@ namespace DM.Data
                     var _userManager = scope.ServiceProvider.GetService<UserManager<DMUser>>();
                     DMDbContext.SeedAdmin(_userManager).Wait();
                     DMDbContext.SeedDamaged().Wait();
-                    DMDbContext.SeedStore().Wait();
                 }
                 catch (Exception ex)
                 {
@@ -73,26 +72,6 @@ namespace DM.Data
             await context.SaveChangesAsync();
         }
 
-        public static async Task SeedStore(this DMDbContext context)
-        {
-            if (await context.Exhibitions.AnyAsync(x => x.Type == ExhibitionType.Store))
-                return;
-            var Store = new Exhibition()
-            {
-                Name = "Store",
-                Type = ExhibitionType.Store,
-                Shelfs = new List<Shelf>
-                {
-                    new Shelf
-                    {
-                        Name = "Store Shelf",
-                        ShelfNo = "Store_Shelf"
-                    }
-                }
-            };
-            await context.Exhibitions.AddAsync(Store); 
-            await context.SaveChangesAsync();
-        }
     }
 
 }

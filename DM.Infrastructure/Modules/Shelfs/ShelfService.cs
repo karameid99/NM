@@ -88,7 +88,7 @@ namespace DM.Infrastructure.Modules.Shelf
             var skipValue = (dto.Page - 1) * dto.PerPage;
 
             return await _context.Shelfs
-                .Where(x => !x.IsDelete && x.Exhibition.Type == Core.Enums.ExhibitionType.Exhibition
+                .Where(x => !x.IsDelete && x.ExhibitionId == dto.ExhibitionId 
                 && (string.IsNullOrEmpty(dto.SearchKey)
                 || x.Name.Contains(dto.SearchKey)))
                 .Skip(skipValue).Take(dto.PerPage)

@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="ProductHistory" targetNamespace="http://tempuri.org/ProductHistory.xsd" xmlns:mstns="http://tempuri.org/ProductHistory.xsd" xmlns="http://tempuri.org/ProductHistory.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="ProductHistory" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="ProductHistory" msprop:Generator_UserDSName="ProductHistory">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="ProductHistory" msprop:Generator_TableClassName="ProductHistoryDataTable" msprop:Generator_TableVarName="tableProductHistory" msprop:Generator_RowChangedName="ProductHistoryRowChanged" msprop:Generator_TablePropName="_ProductHistory" msprop:Generator_RowDeletingName="ProductHistoryRowDeleting" msprop:Generator_RowChangingName="ProductHistoryRowChanging" msprop:Generator_RowEvHandlerName="ProductHistoryRowChangeEventHandler" msprop:Generator_RowDeletedName="ProductHistoryRowDeleted" msprop:Generator_RowClassName="ProductHistoryRow" msprop:Generator_UserTableName="ProductHistory" msprop:Generator_RowEvArgName="ProductHistoryRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="FromShelf" msprop:Generator_ColumnVarNameInTable="columnFromShelf" msprop:Generator_ColumnPropNameInRow="FromShelf" msprop:Generator_ColumnPropNameInTable="FromShelfColumn" msprop:Generator_UserColumnName="FromShelf" type="xs:string" minOccurs="0" />
+              <xs:element name="ToShelf" msprop:Generator_ColumnVarNameInTable="columnToShelf" msprop:Generator_ColumnPropNameInRow="ToShelf" msprop:Generator_ColumnPropNameInTable="ToShelfColumn" msprop:Generator_UserColumnName="ToShelf" type="xs:string" minOccurs="0" />
+              <xs:element name="OldQuantity" msprop:Generator_ColumnVarNameInTable="columnOldQuantity" msprop:Generator_ColumnPropNameInRow="OldQuantity" msprop:Generator_ColumnPropNameInTable="OldQuantityColumn" msprop:Generator_UserColumnName="OldQuantity" type="xs:string" minOccurs="0" />
+              <xs:element name="NewQantity" msprop:Generator_ColumnVarNameInTable="columnNewQantity" msprop:Generator_ColumnPropNameInRow="NewQantity" msprop:Generator_ColumnPropNameInTable="NewQantityColumn" msprop:Generator_UserColumnName="NewQantity" type="xs:string" minOccurs="0" />
+              <xs:element name="Deferance" msprop:Generator_ColumnVarNameInTable="columnDeferance" msprop:Generator_ColumnPropNameInRow="Deferance" msprop:Generator_ColumnPropNameInTable="DeferanceColumn" msprop:Generator_UserColumnName="Deferance" type="xs:string" minOccurs="0" />
+              <xs:element name="MovmantType" msprop:Generator_ColumnVarNameInTable="columnMovmantType" msprop:Generator_ColumnPropNameInRow="MovmantType" msprop:Generator_ColumnPropNameInTable="MovmantTypeColumn" msprop:Generator_UserColumnName="MovmantType" type="xs:string" minOccurs="0" />
+              <xs:element name="FullName" msprop:Generator_ColumnVarNameInTable="columnFullName" msprop:Generator_ColumnPropNameInRow="FullName" msprop:Generator_ColumnPropNameInTable="FullNameColumn" msprop:Generator_UserColumnName="FullName" type="xs:string" minOccurs="0" />
+              <xs:element name="ActionDate" msprop:Generator_ColumnVarNameInTable="columnActionDate" msprop:Generator_ColumnPropNameInRow="ActionDate" msprop:Generator_ColumnPropNameInTable="ActionDateColumn" msprop:Generator_UserColumnName="ActionDate" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

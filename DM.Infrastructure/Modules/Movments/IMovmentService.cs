@@ -1,5 +1,6 @@
 ﻿using DM.Core.Movments;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,8 @@ namespace DM.Infrastructure.Modules.Movments
         Task<List<ProductExhibitionDto>> GetProductDamaged(GetProductDamagedDto dto);
         Task<List<ProductExhibitionDto>> GetProductFinished(GetProductFinishedDto dto);
         Task<List<ProductHistoryDto>> GetProductHistory(GetProductHistoryDto dto);
+        Task<List<ProductHistoryReportDto>> GetallProductHistory(int id);
+        Task<byte[]> GetRdlcPdfPackageAsBinaryDataAsync(string reportPath, int id, string name, List<ProductHistoryReportDto> products);
         Task<GetDashboradDto> GetDashborad();
     }
 }

@@ -14,10 +14,18 @@ namespace DM.Core.DTOs.Products
         [Required]
         public string ProductNo { get; set; }
         public string Description { get; set; }
+        public int ShelfId { get; set; }
+        public int Quantity { get; set; }
         public IFormFile Logo { get; set; }
     }
-    public class UpdateProductDto : CreateProductDto
+    public class UpdateProductDto
     {
         public string Id { get; set; }
+        public string Name { get; set; }
+        [Required]
+        public string ProductNo { get; set; }
+        public string Description { get; set; }
+        public IFormFile Logo { get; set; }
+
     }
 }

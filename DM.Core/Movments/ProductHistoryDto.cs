@@ -17,4 +17,15 @@ namespace DM.Core.Movments
         public int DeferanceQunatity { get; set; }
         public string MovmentType { get; set; }
     }
+    public class ProductHistoryReportDto
+    {
+        public string FullName { get; set; }
+        public string ActionDate { get; set; }
+        public string FromShelf { get; set; }
+        public string ToShelf { get; set; }
+        public int OldQuantity { get; set; }
+        public int NewQantity { get; set; }
+        public int Deferance { get; set; }
+        public string MovmantType { get; set; }
+    }
 }

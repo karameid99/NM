@@ -12,50 +12,51 @@ using System.Threading.Tasks;
 
 namespace NM.API.Controllers
 {
-    public class ExhibitionController : BaseController
+    public class StoreController : BaseController
     {
-        private readonly IExhibitionService _exhibitionService;
+        private readonly IExhibitionService _storeService;
         private readonly ExhibitionType _type;
-        public ExhibitionController(IExhibitionService exhibitionService)
+
+        public StoreController(IExhibitionService exhibitionService)
         {
-            _exhibitionService = exhibitionService;
-            _type = ExhibitionType.Exhibition;
+            _storeService = exhibitionService;
+            _type = ExhibitionType.Store;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] PagingDto dto)
         {
-            var res = await _exhibitionService.GetAll(dto, _type);
+            var res = await _storeService.GetAll(dto, _type);
             return GetResponse(res);
         }
         [HttpGet]
         public async Task<IActionResult> Get(int Id)
         {
-            var res = await _exhibitionService.Get(Id, _type);
+            var res = await _storeService.Get(Id, _type);
             return GetResponse(res);
         }
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateExhibitionDto dto)
         {
-            await _exhibitionService.Create(dto, GetCurrentUserId(), _type);
+            await _storeService.Create(dto, GetCurrentUserId(), _type);
             return GetResponse();
         }
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] UpdateExhibitionDto dto)
         {
-            await _exhibitionService.Update(dto, GetCurrentUserId(), _type);
+            await _storeService.Update(dto, GetCurrentUserId(), _type);
             return GetResponse();
         }
         [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {
-            await _exhibitionService.Delete(id, GetCurrentUserId(), _type);
+            await _storeService.Delete(id, GetCurrentUserId(), _type);
             return GetResponse();
         }
         [HttpGet]
         public async Task<IActionResult> List()
         {
-            var res = await _exhibitionService.List(_type);
+            var res = await _storeService.List(_type);
             return GetResponse(res);
         }
     }

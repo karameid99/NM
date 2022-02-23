@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DM.Core.Entities;
+using DM.Core.Enums;
 
 namespace DM.Infrastructure.Modules.Exhibition
 {
@@ -22,20 +23,20 @@ namespace DM.Infrastructure.Modules.Exhibition
             _mapper = napper;
         }
 
-        public async Task Create(CreateExhibitionDto dto, string userId)
+        public async Task Create(CreateExhibitionDto dto, string userId, ExhibitionType type)
         {
             var exhibition = _mapper.Map<DM.Core.Entities.Exhibition>(dto);
             exhibition.CreatedBy = userId;
-            exhibition.Type = Core.Enums.ExhibitionType.Exhibition;
+            exhibition.Type = type;
             await _context.Exhibitions.AddAsync(exhibition);
             await _context.SaveChangesAsync();
         }
 
 
 
-        public async Task Delete(int id, string userId)
+        public async Task Delete(int id, string userId, ExhibitionType type)
         {
-            var exhibition = await _context.Exhibitions.FirstOrDefaultAsync(x => x.Id == id);
+            var exhibition = await _context.Exhibitions.FirstOrDefaultAsync(x => x.Id == id && x.Type == type);
             if (exhibition == null)
                 throw new DMException("Exhibitions does't exists");
             if (exhibition.IsDelete)
@@ -47,9 +48,9 @@ namespace DM.Infrastructure.Modules.Exhibition
         }
 
 
-        public async Task<ExhibitionDto> Get(int id)
+        public async Task<ExhibitionDto> Get(int id, ExhibitionType type)
         {
-            var exhibition = await _context.Exhibitions.FirstOrDefaultAsync(x => x.Id == id);
+            var exhibition = await _context.Exhibitions.FirstOrDefaultAsync(x => x.Id == id && x.Type == type);
             if (exhibition == null)
                 throw new DMException("Exhibitions does't exists");
             if (exhibition.IsDelete)
@@ -58,10 +59,10 @@ namespace DM.Infrastructure.Modules.Exhibition
         }
 
 
-        public async Task<List<ListItemDto>> List()
+        public async Task<List<ListItemDto>> List(ExhibitionType type)
         {
             return await _context.Exhibitions
-                    .Where(x => !x.IsDelete && x.Type == Core.Enums.ExhibitionType.Exhibition)
+                    .Where(x => !x.IsDelete && x.Type == type)
                     .Select(c => new ListItemDto
                     {
                         Id = c.Id,
@@ -70,9 +71,9 @@ namespace DM.Infrastructure.Modules.Exhibition
         }
 
 
-        public async Task Update(UpdateExhibitionDto dto, string userId)
+        public async Task Update(UpdateExhibitionDto dto, string userId, ExhibitionType type)
         {
-            var exhibition = await _context.Exhibitions.FirstOrDefaultAsync(x => x.Id == dto.Id);
+            var exhibition = await _context.Exhibitions.FirstOrDefaultAsync(x => x.Id == dto.Id && x.Type == type);
             if (exhibition == null)
                 throw new DMException("Exhibitions does't exists");
             if (exhibition.IsDelete)
@@ -85,12 +86,12 @@ namespace DM.Infrastructure.Modules.Exhibition
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<ExhibitionDto>> GetAll(PagingDto dto)
+        public async Task<List<ExhibitionDto>> GetAll(PagingDto dto, ExhibitionType type)
         {
             var skipValue = (dto.Page - 1) * dto.PerPage;
 
             return await _context.Exhibitions
-                .Where(x => !x.IsDelete && x.Type == Core.Enums.ExhibitionType.Exhibition
+                .Where(x => !x.IsDelete && x.Type == type
                 && (string.IsNullOrEmpty(dto.SearchKey)
                 || x.Name.Contains(dto.SearchKey)))
                 .Skip(skipValue).Take(dto.PerPage)

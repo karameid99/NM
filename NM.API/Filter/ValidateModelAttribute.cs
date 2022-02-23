@@ -37,7 +37,6 @@ namespace NM.API.Filters
 			if (!context.ExceptionHandled && context.Exception != null)
 			{
 				APIResponse response = null;
-				var message = string.Empty;
 				if (context.Exception is DMException)
 				{
 					response = new APIResponse()
