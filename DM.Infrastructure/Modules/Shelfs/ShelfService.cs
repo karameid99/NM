@@ -24,6 +24,10 @@ namespace DM.Infrastructure.Modules.Shelf
         {
             var Shelf = _mapper.Map<DM.Core.Entities.Shelf>(dto);
             Shelf.CreatedBy = userId;
+
+            if (await _context.Shelfs.AnyAsync(x => x.ShelfNo.Contains(Shelf.ShelfNo) && dto.ExhibitionId == x.ExhibitionId))
+                throw new DMException("Shelf Number Already Exist");
+
             await _context.Shelfs.AddAsync(Shelf);
             await _context.SaveChangesAsync();
         }
@@ -55,14 +59,15 @@ namespace DM.Infrastructure.Modules.Shelf
         }
 
 
-        public async Task<List<ListItemDto>> List(int exhibitionId)
+        public async Task<List<ListItemShelfDto>> List(int exhibitionId)
         {
             return await _context.Shelfs
-                    .Where(x => !x.IsDelete && x.Exhibition.Type == Core.Enums.ExhibitionType.Exhibition && x.ExhibitionId == exhibitionId)
-                    .Select(c => new ListItemDto
+                    .Where(x => !x.IsDelete  && x.ExhibitionId == exhibitionId)
+                    .Select(c => new ListItemShelfDto
                     {
                         Id = c.Id,
                         Name = c.Name,
+                        ShelfNo = c.ShelfNo
                     }).ToListAsync();
         }
 
@@ -74,7 +79,10 @@ namespace DM.Infrastructure.Modules.Shelf
                 throw new DMException("Shelf does't exists");
             if (Shelf.IsDelete)
                 throw new DMException("Shelf already deleted");
-             
+
+            if (await _context.Shelfs.AnyAsync(x => x.ShelfNo.Contains(Shelf.ShelfNo) && dto.ExhibitionId == x.ExhibitionId && x.Id != dto.Id))
+                throw new DMException("Shelf Number Already Exist");
+
             Shelf.Name = dto.Name;
             Shelf.ShelfNo = dto.ShelfNo;
             Shelf.ExhibitionId = dto.ExhibitionId;

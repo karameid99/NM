@@ -11,7 +11,7 @@ namespace DM.Core.DTOs.General
     {
         [Range(1, int.MaxValue)]
         public int Page { get; set; }
-        [Range(1, 50)]
+        [Range(1, 1000)]
         public int PerPage { get; set; }
         public string SearchKey { get; set; }
     }

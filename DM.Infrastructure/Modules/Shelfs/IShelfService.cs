@@ -15,7 +15,7 @@ namespace DM.Infrastructure.Modules.Shelf
         Task Create(CreateShelfDto dto, string userId);
         Task Update(UpdateShelfDto dto, string userId);
         Task Delete(int id , string userId);
-        Task<List<ListItemDto>> List(int exhibitionId);
+        Task<List<ListItemShelfDto>> List(int exhibitionId);
 
     }
 }

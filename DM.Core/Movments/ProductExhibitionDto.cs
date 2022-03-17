@@ -8,9 +8,11 @@ namespace DM.Core.Movments
 {
    public class ProductExhibitionDto 
     {
+        public string ProductNo { get; set; }
         public int Id { get; set; }
         public string Name { get; set; }
         public string ShelfName { get; set; }
+        public string ShelfNo { get; set; }
         public string LogoPath { get; set; }
         public int ShelfId { get; set; }
         public int Quantity  { get; set; }

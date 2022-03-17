@@ -43,6 +43,7 @@ namespace DM.Data
             var user = new DMUser()
             {
                 UserName = "AboYusef",
+                Email = "AboYusef@Gmail.com",
                 UserType = UserType.Admin,
                 FirstName = "Abo",
                 LastName = "Yusef", 

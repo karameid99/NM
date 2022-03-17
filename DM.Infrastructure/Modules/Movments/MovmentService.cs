@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DM.Core.DTOs.Products;
 using DM.Core.Entities;
 using DM.Core.Enums;
 using DM.Core.Exceptions;
@@ -28,18 +29,18 @@ namespace DM.Infrastructure.Modules.Movments
         }
 
         #region single Movment
-        public async Task SingleProductMovmant(SingleProductMovmantDto dto, string userId)
+        public async Task SingleProductMovmant(SingleProductMovmantDto dto, string userId, bool isExternal = false)
         {
             switch (dto.MovmentActionType)
             {
                 case MovmentActionType.AddMovemnt:
-                    await SingleAddedMovmentType(dto.Id, dto.ShelfId, dto.Quantity, userId);
+                    await SingleAddedMovmentType(dto.Id, dto.ShelfId, dto.Quantity, userId, isExternal);
                     break;
                 case MovmentActionType.NormalMovment:
                     await SingleNormalMovmentType(dto.ShelfId, dto.Quantity, dto.Id, userId, null);
                     break;
                 case MovmentActionType.MoveToStore:
-                    await SingleAddedMovmentType(dto.Id, dto.ShelfId, dto.Quantity, userId);
+                    await SingleNormalMovmentType(dto.ShelfId, dto.Quantity, dto.Id, userId, null);
                     break;
                 case MovmentActionType.MoveToDamage:
                     await SingleMoveToDamageMovmentType(dto.Quantity, dto.Id, userId);
@@ -48,10 +49,12 @@ namespace DM.Infrastructure.Modules.Movments
                     break;
             }
         }
-        private async Task SingleAddedMovmentType(int productId, int shelfId, int quantity, string userId)
+        private async Task SingleAddedMovmentType(int productId, int shelfId, int quantity, string userId,bool isExternal)
         {
             ShelfProduct shelfProduct = null;
-            shelfProduct = await _context.ShelfProducts.FirstOrDefaultAsync(x => x.ProductId == productId && shelfId == x.ShelfId);
+            shelfProduct = await _context.ShelfProducts.FirstOrDefaultAsync(x =>
+            (isExternal ?  x.Id == productId : x.ProductId == productId)
+            && shelfId == x.ShelfId);
             var OldQuantity = 0;
             if (shelfProduct != null)
             {
@@ -147,7 +150,7 @@ namespace DM.Infrastructure.Modules.Movments
                 && (!dto.ShelfId.HasValue || x.ShelfId == dto.ShelfId)
                 && (!finished || x.Quantity == 0)
                 && (finished || x.Quantity > 0)
-                && (string.IsNullOrEmpty(dto.SearchKey) || x.Product.Name.Contains(dto.SearchKey)))
+                && (string.IsNullOrEmpty(dto.SearchKey) || x.Product.ProductNo.Contains(dto.SearchKey) || x.Product.Name.Contains(dto.SearchKey)))
                 .Skip(skipValue).Take(dto.PerPage)
                 .Select(c => new ProductExhibitionDto
                 {
@@ -156,7 +159,9 @@ namespace DM.Infrastructure.Modules.Movments
                     ShelfId = c.ShelfId,
                     ShelfName = c.Shelf.Name,
                     LogoPath = c.Product.LogoPath,
-                    Quantity = c.Quantity
+                    Quantity = c.Quantity,
+                    ProductNo = c.Product.ProductNo,
+                    ShelfNo = c.Shelf.ShelfNo
                 }).ToListAsync();
         }
         public async Task<List<ProductExhibitionDto>> GetProductStore(GetProductStoreDto dto)
@@ -178,9 +183,9 @@ namespace DM.Infrastructure.Modules.Movments
             report.ReportPath = reportPath;
             ReportParameter[] param = new ReportParameter[3];
 
-            param[0] = new ReportParameter("ProductNumber", product.ProductNo);
-            param[1] = new ReportParameter("ProductName", product.Name);
-            param[2] = new ReportParameter("ProductDescription", product.Description);
+            param[0] = new ReportParameter("ProductNumber", product.ProductNo ?? "-");
+            param[1] = new ReportParameter("ProductName", product.Name ?? "-");
+            param[2] = new ReportParameter("ProductDescription", product.Description ?? "-");
 
             report.SetParameters(param);
 
@@ -216,7 +221,7 @@ namespace DM.Infrastructure.Modules.Movments
         public async Task<List<ProductHistoryReportDto>> GetallProductHistory(int id)
         {
             return await _context.ProductHistories
-                .Where(x=> x.NewShelfProductId == id)
+                .Where(x => x.NewShelfProductId == id)
                 .Include(x => x.NewShelfProduct)
                 .ThenInclude(x => x.Shelf)
                 .Include(x => x.OldShelfProduct)
@@ -239,12 +244,37 @@ namespace DM.Infrastructure.Modules.Movments
             return new GetDashboradDto
             {
                 CurrentProducts = await _context.Products.CountAsync(x => !x.IsDelete),
-                DamagedProducts = await _context.ShelfProducts.Where(x => !x.IsDelete && x.Shelf.Exhibition.Type == ExhibitionType.Damaged).CountAsync(),
+                DamagedProducts = await _context.ShelfProducts.Where(x => !x.IsDelete && x.Shelf.Exhibition.Type == ExhibitionType.Damaged && x.Quantity != 0).CountAsync(),
                 Exhibitions = await _context.Exhibitions.CountAsync(x => x.Type == ExhibitionType.Exhibition && !x.IsDelete),
                 Users = await _context.Users.CountAsync(x => !x.IsDelete && x.UserType == UserType.Supervisor),
                 FinishedProducts = await _context.ShelfProducts.Where(x => !x.IsDelete && x.Quantity == 0).CountAsync(),
                 StoreProducts = await _context.Exhibitions.Where(x => !x.IsDelete && x.Type == ExhibitionType.Store).CountAsync(),
             };
+        }
+        public async Task<List<SearchProductDto>> GetProducts(SearchProductInput input)
+        {
+            var skipValue = (input.Page - 1) * input.PerPage;
+
+            return await _context.ShelfProducts.Where(x => (string.IsNullOrEmpty(input.SearchKey)
+            || x.Product.Name.Contains(input.SearchKey)
+            || x.Product.ProductNo.Contains(input.SearchKey)
+            || x.Shelf.Name.Contains(input.SearchKey)
+            || x.Shelf.ShelfNo.Contains(input.SearchKey)
+            || x.Shelf.Exhibition.Name.Contains(input.SearchKey)
+            )).Select(x => new SearchProductDto
+            {
+                ExhibitionId = x.Shelf.ExhibitionId,
+                ExhibitionName = x.Shelf.Exhibition.Name,
+                LogoPath = x.Product.LogoPath,
+                Id = x.Id,
+                ProductName = x.Product.Name,
+                ProductNo = x.Product.ProductNo,
+                Quantity = x.Quantity,
+                ShelfId = x.ShelfId,
+                ShelfName = x.Shelf.Name,
+                ShelfNo = x.Shelf.ShelfNo,
+                IsStore = x.Shelf.Exhibition.Type == ExhibitionType.Store,
+            }).OrderByDescending(x=> x.Id).Skip(skipValue).Take(input.PerPage).ToListAsync();
         }
         #endregion
     }

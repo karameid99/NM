@@ -11,4 +11,10 @@ namespace DM.Core.DTOs.General
         public string Name { get; set; }
         public int Id { get; set; }
     }
+    public class ListItemShelfDto
+    {
+        public string Name { get; set; }
+        public string ShelfNo { get; set; }
+        public int Id { get; set; }
+    }
 }

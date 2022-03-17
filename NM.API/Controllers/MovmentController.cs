@@ -1,4 +1,5 @@
-﻿using DM.Core.Movments;
+﻿using DM.Core.DTOs.Products;
+using DM.Core.Movments;
 using DM.Infrastructure.Modules.Movments;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections;
@@ -70,6 +71,12 @@ namespace NM.API.Controllers
            var file =  await _MovmentService.GetRdlcPdfPackageAsBinaryDataAsync(reportPath,id, "ProductHistory", await _MovmentService.GetallProductHistory(id));
 
             return File(file, "Application/pdf");
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetProducts([FromQuery] SearchProductInput input)
+        {
+            var res = await _MovmentService.GetProducts(input);
+            return GetResponse(res);
         }
 
     }
