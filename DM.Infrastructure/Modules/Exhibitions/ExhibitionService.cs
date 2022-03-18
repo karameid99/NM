@@ -37,10 +37,15 @@ namespace DM.Infrastructure.Modules.Exhibition
         public async Task Delete(int id, string userId, ExhibitionType type)
         {
             var exhibition = await _context.Exhibitions.FirstOrDefaultAsync(x => x.Id == id && x.Type == type);
+
             if (exhibition == null)
                 throw new DMException("Exhibitions does't exists");
+
             if (exhibition.IsDelete)
                 throw new DMException("Exhibitions already deleted");
+
+            if (await _context.Shelfs.AnyAsync(x => !x.IsDelete && x.ExhibitionId == id))
+                throw new DMException($"Can't Delete this {type} because the {type} contains Shelfs");
 
             exhibition.IsDelete = true;
             _context.Exhibitions.Update(exhibition);

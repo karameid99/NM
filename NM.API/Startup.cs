@@ -43,7 +43,7 @@ namespace NM.API
             services.AddAutoMapper(typeof(Startup));
             services.AddDefaultIdentity<DMUser>(options => {
                 options.Password.RequireDigit = false;
-                options.Password.RequiredLength = 6;
+                options.Password.RequiredLength = 4;
                 options.Password.RequireLowercase = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
@@ -52,10 +52,10 @@ namespace NM.API
             services.Configure<ImageSettings>(Configuration.GetSection("ImageSettings"));
 
             services.AddControllers();
-            //services.AddMvc(options =>
-            //{
-            //    options.Filters.Add(typeof(ValidateModelAttribute));
-            //});
+            services.AddMvc(options =>
+            {
+                options.Filters.Add(typeof(ValidateModelAttribute));
+            });
             services.AddTransient<IAuthService, AuthService>();
             services.AddSingleton<IImageService, ImageService>();
             services.AddScoped<IExhibitionService, ExhibitionService>();

@@ -178,7 +178,6 @@ namespace DM.Infrastructure.Modules.Movments
         {
             var productShelfId = await _context.ProductHistories.Include(c => c.NewShelfProduct).Where(x => x.NewShelfProductId == id).Select(x => x.NewShelfProductId).FirstOrDefaultAsync();
             var product = await _context.ShelfProducts.Include(c => c.Product).Where(x => x.Id == productShelfId).Select(x => x.Product).FirstOrDefaultAsync();
-            reportPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + reportPath;
             LocalReport report = new LocalReport();
             report.ReportPath = reportPath;
             ReportParameter[] param = new ReportParameter[3];

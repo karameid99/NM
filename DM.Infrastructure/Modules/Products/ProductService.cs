@@ -32,7 +32,7 @@ namespace DM.Infrastructure.Modules.Product
             Product.CreatedBy = userId;
             if (dto.Logo != null) Product.LogoPath = await _imageService.Save(dto.Logo, "Images");
 
-            if (await _context.Products.AnyAsync(x=> x.ProductNo.Contains(Product.ProductNo)))
+            if (await _context.Products.AnyAsync(x=> !x.IsDelete && x.ProductNo.Equals(Product.ProductNo)))
                 throw new DMException("Product Number Already Exist");
 
             await _context.Products.AddAsync(Product);
@@ -91,7 +91,7 @@ namespace DM.Infrastructure.Modules.Product
                 throw new DMException("Products already deleted");
 
 
-            if (await _context.Products.AnyAsync(x => x.ProductNo.Contains(Product.ProductNo) && x.Id.ToString() != dto.Id))
+            if (await _context.Products.AnyAsync(x => !x.IsDelete && x.ProductNo.Equals(Product.ProductNo) && x.Id.ToString() != dto.Id))
                 throw new DMException("Product Number Already Exist");
 
 

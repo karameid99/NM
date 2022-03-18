@@ -16,6 +16,7 @@ namespace DM.Infrastructure.Modules.Auth
         Task Create(CreateUserDto dto);
         Task Update(UpdateUserDto dto);
         Task Delete(string id);
+        Task ChangeAdminPassword(ChangePasswordAdmindto dto, string userId);
 
     }
 }

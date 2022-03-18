@@ -25,7 +25,7 @@ namespace DM.Infrastructure.Modules.Shelf
             var Shelf = _mapper.Map<DM.Core.Entities.Shelf>(dto);
             Shelf.CreatedBy = userId;
 
-            if (await _context.Shelfs.AnyAsync(x => x.ShelfNo.Contains(Shelf.ShelfNo) && dto.ExhibitionId == x.ExhibitionId))
+            if (await _context.Shelfs.AnyAsync(x => !x.IsDelete && x.ShelfNo.Equals(Shelf.ShelfNo) && dto.ExhibitionId == x.ExhibitionId ))
                 throw new DMException("Shelf Number Already Exist");
 
             await _context.Shelfs.AddAsync(Shelf);
@@ -41,6 +41,10 @@ namespace DM.Infrastructure.Modules.Shelf
                 throw new DMException("Shelf does't exists");
             if (Shelf.IsDelete)
                 throw new DMException("Shelf already deleted");
+
+            if (await _context.ShelfProducts.AnyAsync(x=> !x.IsDelete && x.ShelfId == id && x.Quantity > 0))
+                throw new DMException("Can't Delete this shelf because the shelf contains product");
+
 
             Shelf.IsDelete = true;
             _context.Shelfs.Update(Shelf);
@@ -68,7 +72,7 @@ namespace DM.Infrastructure.Modules.Shelf
                         Id = c.Id,
                         Name = c.Name,
                         ShelfNo = c.ShelfNo
-                    }).ToListAsync();
+                    }).OrderBy(x=> x.ShelfNo).ToListAsync();
         }
 
 
@@ -80,7 +84,7 @@ namespace DM.Infrastructure.Modules.Shelf
             if (Shelf.IsDelete)
                 throw new DMException("Shelf already deleted");
 
-            if (await _context.Shelfs.AnyAsync(x => x.ShelfNo.Contains(Shelf.ShelfNo) && dto.ExhibitionId == x.ExhibitionId && x.Id != dto.Id))
+            if (await _context.Shelfs.AnyAsync(x => !x.IsDelete && x.ShelfNo.Equals(Shelf.ShelfNo) && dto.ExhibitionId == x.ExhibitionId && x.Id != dto.Id))
                 throw new DMException("Shelf Number Already Exist");
 
             Shelf.Name = dto.Name;
@@ -99,7 +103,7 @@ namespace DM.Infrastructure.Modules.Shelf
                 .Where(x => !x.IsDelete && x.ExhibitionId == dto.ExhibitionId 
                 && (string.IsNullOrEmpty(dto.SearchKey)
                 || x.Name.Contains(dto.SearchKey)))
-                .Skip(skipValue).Take(dto.PerPage)
+                .OrderBy(x => x.ShelfNo).Skip(skipValue).Take(dto.PerPage)
                 .Select(c => new ShelfDto
                 {
                     Id = c.Id,

@@ -113,6 +113,18 @@ namespace DM.Infrastructure.Modules.Auth
             };
         }
 
+        public async Task ChangeAdminPassword(ChangePasswordAdmindto dto, string userId)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            if (user == null)
+                throw new DMException("User does't exists");
+            if (user.IsDelete)
+                throw new DMException("User already deleted");
+
+            var token = await _userService.GeneratePasswordResetTokenAsync(user);
+            await _userService.ResetPasswordAsync(user, token, dto.Password);
+
+        }
         public async Task Update(UpdateUserDto dto)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == dto.Id);
@@ -126,8 +138,16 @@ namespace DM.Infrastructure.Modules.Auth
             user.FirstName = dto.FirstName;
             user.LastName = dto.LastName;
             user.UserName = dto.UserName;
+
+            if (string.IsNullOrEmpty(dto.Password))
+            {
+                var token = await _userService.GeneratePasswordResetTokenAsync(user);
+                await _userService.ResetPasswordAsync(user, token, dto.Password);
+            }
+           
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
+
         }
         private string CreateAccess(DMUser user)
         {

@@ -48,5 +48,11 @@ namespace NM.API.Controllers
             await _authService.Delete(id);
             return GetResponse();
         }
+        [HttpPost]
+        public async Task<IActionResult> ChangePasswordAdmin(ChangePasswordAdmindto dto)
+        {
+            await _authService.ChangeAdminPassword(dto, GetCurrentUserId());
+            return GetResponse();
+        }
     }
 }

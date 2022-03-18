@@ -1,8 +1,10 @@
 ﻿using DM.Core.DTOs.Products;
 using DM.Core.Movments;
 using DM.Infrastructure.Modules.Movments;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace NM.API.Controllers
@@ -10,10 +12,12 @@ namespace NM.API.Controllers
     public class MovmentController : BaseController
     {
         private readonly IMovmentService _MovmentService;
+        private readonly IWebHostEnvironment environment;
 
-        public MovmentController(IMovmentService MovmentService)
+        public MovmentController(IMovmentService MovmentService, IWebHostEnvironment environment)
         {
             _MovmentService = MovmentService;
+            this.environment = environment;
         }
 
         [HttpGet]
@@ -59,7 +63,7 @@ namespace NM.API.Controllers
         [HttpGet]
         public async Task<IActionResult> Print(int id) 
         {
-            var reportPath = "/Module/Movment/Reports/Invoice.rdlc";
+            var reportPath = environment.WebRootPath + "/Invoice.rdlc";
 
             ArrayList data = new ArrayList();
             ArrayList data1 = new ArrayList();
