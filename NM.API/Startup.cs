@@ -4,6 +4,7 @@ using DM.Infrastructure.Modules.Auth;
 using DM.Infrastructure.Modules.Exhibition;
 using DM.Infrastructure.Modules.Image;
 using DM.Infrastructure.Modules.Movments;
+using DM.Infrastructure.Modules.Movments.Reports.ReportsModule;
 using DM.Infrastructure.Modules.Product;
 using DM.Infrastructure.Modules.Shelf;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using NM.API.Filter;
 using NM.API.Filters;
 using NM.Data.Data;
 using System.Collections.Generic;
@@ -62,6 +64,7 @@ namespace NM.API
             services.AddScoped<IShelfService, ShelfService>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IMovmentService, MovmentService>();
+            services.AddScoped<IReportService, ReportService>();
 
             services.AddAuthentication(config =>
             {
@@ -135,6 +138,7 @@ namespace NM.API
 
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseRequestResponseLogging();
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>

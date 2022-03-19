@@ -11,6 +11,7 @@ namespace DM.Core.Enums
         AddMovemnt = 1,
         NormalMovment = 2,
         MoveToStore = 3,
-        MoveToDamage = 4
+        MoveToDamage = 4,
+        DeleteQuantity = 5
     }
 }

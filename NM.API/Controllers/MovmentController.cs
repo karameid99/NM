@@ -82,6 +82,12 @@ namespace NM.API.Controllers
             var res = await _MovmentService.GetProducts(input);
             return GetResponse(res);
         }
+         [HttpDelete]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            await _MovmentService.DeleteProduct(id);
+            return GetResponse();
+        }
 
     }
 }

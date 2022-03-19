@@ -11,7 +11,7 @@ namespace DM.Core.DTOs.Shelfs
     {
         [Required]
         public string Name { get; set; }
-        public string ShelfNo { get; set; }
+        public int ShelfNo { get; set; }
         public int ExhibitionId { get; set; }
     }
     public class UpdateShelfDto : CreateShelfDto

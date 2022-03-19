@@ -21,5 +21,6 @@ namespace DM.Infrastructure.Modules.Movments
         Task<byte[]> GetRdlcPdfPackageAsBinaryDataAsync(string reportPath, int id, string name, List<ProductHistoryReportDto> products);
         Task<GetDashboradDto> GetDashborad();
         Task<List<SearchProductDto>> GetProducts(SearchProductInput input);
+        Task DeleteProduct(int id);
     }
 }

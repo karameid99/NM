@@ -4,6 +4,7 @@ using DM.Core.DTOs.Shelfs;
 using DM.Core.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using NM.Data.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -72,7 +73,7 @@ namespace DM.Infrastructure.Modules.Shelf
                         Id = c.Id,
                         Name = c.Name,
                         ShelfNo = c.ShelfNo
-                    }).OrderBy(x=> x.ShelfNo).ToListAsync();
+                    }).OrderBy(x=> Convert.ToInt32(x.ShelfNo)).ToListAsync();
         }
 
 
@@ -88,7 +89,7 @@ namespace DM.Infrastructure.Modules.Shelf
                 throw new DMException("Shelf Number Already Exist");
 
             Shelf.Name = dto.Name;
-            Shelf.ShelfNo = dto.ShelfNo;
+            Shelf.ShelfNo = dto.ShelfNo.ToString();
             Shelf.ExhibitionId = dto.ExhibitionId;
 
             _context.Shelfs.Update(Shelf);
@@ -103,7 +104,7 @@ namespace DM.Infrastructure.Modules.Shelf
                 .Where(x => !x.IsDelete && x.ExhibitionId == dto.ExhibitionId 
                 && (string.IsNullOrEmpty(dto.SearchKey)
                 || x.Name.Contains(dto.SearchKey)))
-                .OrderBy(x => x.ShelfNo).Skip(skipValue).Take(dto.PerPage)
+                .OrderBy(x => Convert.ToInt32(x.ShelfNo)).Skip(skipValue).Take(dto.PerPage)
                 .Select(c => new ShelfDto
                 {
                     Id = c.Id,

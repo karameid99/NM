@@ -9,15 +9,17 @@ namespace DM.Core.Enums
 {
     public enum MovmentType
     {
-        [Description("Add quantity to product")]
+        [Description("Add quantity")]
         AddedMovemnt = 1,
-        [Description("Internal Movment")]
+        [Description("Transfering to onther shelf")]
         InternalMovment = 2,
-        [Description("External Movment")]
+        [Description("Moving from wearhouse to another")]
         ExternalMovment = 3,
         [Description("Move To Store")]
         MoveToStore = 4,
-        [Description("Move To Damaged")]
-        MoveToDamaged = 5
+        [Description("Move To Damaged section")]
+        MoveToDamaged = 5,
+        [Description("Deleted quantity")]
+        DeletedMovemnt = 6
     }
 }

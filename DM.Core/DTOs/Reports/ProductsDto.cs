@@ -4,14 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DM.Core.Entities
+namespace DM.Core.DTOs.Reports
 {
-   public class Product : BaseEntity
+    public class ProductsDto
     {
         public string Name { get; set; }
-        public string ProductNo { get; set; }
+        public string Number { get; set; }
         public string Description { get; set; }
-        public string LogoPath { get; set; }
-        public List<ShelfProduct> ShelfProducts { get; set; }
     }
 }

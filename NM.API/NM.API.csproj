@@ -7,10 +7,18 @@
 
 	<ItemGroup>
 	  <Content Remove="wwwroot\Invoice.rdlc" />
+	  <Content Remove="wwwroot\Products.rdlc" />
+	  <Content Remove="wwwroot\SearchProduct.rdlc" />
+	  <Content Remove="wwwroot\ShelfProduct.rdlc" />
+	  <Content Remove="wwwroot\WearhouseProduct.rdlc" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <None Include="wwwroot\Invoice.rdlc" />
+	  <None Include="wwwroot\Products.rdlc" />
+	  <None Include="wwwroot\SearchProduct.rdlc" />
+	  <None Include="wwwroot\ShelfProduct.rdlc" />
+	  <None Include="wwwroot\WearhouseProduct.rdlc" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -21,6 +29,7 @@
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.11" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.11" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.3" />
+		<PackageReference Include="ServiceStack.Text" Version="6.0.2" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.0.2" />
 
 

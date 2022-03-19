@@ -10,6 +10,7 @@ using NM.Data.Data;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -40,20 +41,23 @@ namespace DM.Infrastructure.Modules.Movments
                     await SingleNormalMovmentType(dto.ShelfId, dto.Quantity, dto.Id, userId, null);
                     break;
                 case MovmentActionType.MoveToStore:
-                    await SingleNormalMovmentType(dto.ShelfId, dto.Quantity, dto.Id, userId, null);
+                    await SingleNormalMovmentType(dto.ShelfId, dto.Quantity, dto.Id, userId,MovmentType.MoveToStore);
                     break;
                 case MovmentActionType.MoveToDamage:
                     await SingleMoveToDamageMovmentType(dto.Quantity, dto.Id, userId);
+                    break;
+                case MovmentActionType.DeleteQuantity:
+                    await SingleAddedMovmentType(dto.Id, dto.ShelfId, -dto.Quantity, userId, isExternal);
                     break;
                 default:
                     break;
             }
         }
-        private async Task SingleAddedMovmentType(int productId, int shelfId, int quantity, string userId,bool isExternal)
+        private async Task SingleAddedMovmentType(int productId, int shelfId, int quantity, string userId, bool isExternal)
         {
             ShelfProduct shelfProduct = null;
             shelfProduct = await _context.ShelfProducts.FirstOrDefaultAsync(x =>
-            (isExternal ?  x.Id == productId : x.ProductId == productId)
+            (!isExternal ? x.Id == productId : x.ProductId == productId)
             && shelfId == x.ShelfId);
             var OldQuantity = 0;
             if (shelfProduct != null)
@@ -72,7 +76,7 @@ namespace DM.Infrastructure.Modules.Movments
             }
             _context.ShelfProducts.Update(shelfProduct);
             await _context.SaveChangesAsync();
-            await AddSingleProuctHistory(shelfProduct.Id, MovmentType.AddedMovemnt, OldQuantity, quantity, userId, null);
+            await AddSingleProuctHistory(shelfProduct.Id, quantity > 0? MovmentType.AddedMovemnt : MovmentType.DeletedMovemnt, OldQuantity, quantity, userId, null);
             await _context.SaveChangesAsync();
         }
         private async Task SingleNormalMovmentType(int shelfId, int quantity, int currentShelfId, string userId, MovmentType? publicMovmentType)
@@ -148,9 +152,9 @@ namespace DM.Infrastructure.Modules.Movments
                 .Where(x => !x.IsDelete
                 && (!dto.ExhibitionId.HasValue || x.Shelf.ExhibitionId == dto.ExhibitionId)
                 && (!dto.ShelfId.HasValue || x.ShelfId == dto.ShelfId)
-                && (!finished || x.Quantity == 0)
-                && (finished || x.Quantity > 0)
-                && (string.IsNullOrEmpty(dto.SearchKey) || x.Product.ProductNo.Contains(dto.SearchKey) || x.Product.Name.Contains(dto.SearchKey)))
+                && (string.IsNullOrEmpty(dto.SearchKey) 
+                || x.Product.ProductNo.Contains(dto.SearchKey) 
+                || x.Product.Name.Contains(dto.SearchKey)))
                 .Skip(skipValue).Take(dto.PerPage)
                 .Select(c => new ProductExhibitionDto
                 {
@@ -196,7 +200,7 @@ namespace DM.Infrastructure.Modules.Movments
         public async Task<List<ProductHistoryDto>> GetProductHistory(GetProductHistoryDto dto)
         {
             var skipValue = (dto.Page - 1) * dto.PerPage;
-            return await _context.ProductHistories
+            var data =  await _context.ProductHistories
                 .Where(x => !x.IsDelete && x.NewShelfProductId == dto.Id
                 && (!dto.FromDate.HasValue || x.CreatedAt.Value.Date >= dto.FromDate.Value.Date)
                 && (!dto.ToDate.HasValue || x.CreatedAt.Value.Date <= dto.ToDate.Value.Date))
@@ -205,21 +209,41 @@ namespace DM.Infrastructure.Modules.Movments
                 {
                     FullName = c.UserFullName,
                     ActionDate = c.CreatedAt,
-                    ToShelf = c.NewShelfProduct.Shelf.Name,
-                    FromShelf = c.OldShelfProduct != null ? c.OldShelfProduct.Shelf.Name : "---",
+                    ToShelf = c.AddedQuantity > 0 ? c.NewShelfProduct.Shelf.Name : c.OldShelfProduct.Shelf.Name,
+                    FromShelf = c.AddedQuantity > 0 ? c.OldShelfProduct != null ? c.OldShelfProduct.Shelf.Name : "---" : c.NewShelfProduct.Shelf.Name,
                     NewQuantity = c.NewQuantity,
                     OldQuantity = c.OldQuantity,
                     DeferanceQunatity = c.AddedQuantity,
-                    MovmentType = c.MovmentType.ToString()
+                    MovmentTypeEnum = c.MovmentType,
                 }).ToListAsync();
+
+            foreach (var item in data)
+                item.MovmentType = GetEnumDescription(item.MovmentTypeEnum);
+
+            return data;
         }
         public async Task<List<ProductExhibitionDto>> GetProductFinished(GetProductFinishedDto dto)
         {
-            return await GetProductExhibition(new GetProductExhibitionDto { Page = dto.Page, PerPage = dto.PerPage, SearchKey = dto.SearchKey }, true);
+            var skipValue = (dto.Page - 1) * dto.PerPage;
+            return await _context.Products
+                .Where(x => !x.IsDelete
+                && !x.ShelfProducts.Any(c=> c.Quantity >0 && c.Shelf.Exhibition.Type == ExhibitionType.Exhibition)
+                && (string.IsNullOrEmpty(dto.SearchKey)
+                || x.ProductNo.Contains(dto.SearchKey)
+                || x.Name.Contains(dto.SearchKey)))
+                .Skip(skipValue).Take(dto.PerPage)
+                .Select(c => new ProductExhibitionDto
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    LogoPath = c.LogoPath,
+                    Quantity = 0,
+                    ProductNo = c.ProductNo,
+                }).ToListAsync();
         }
         public async Task<List<ProductHistoryReportDto>> GetallProductHistory(int id)
         {
-            return await _context.ProductHistories
+            var data = await _context.ProductHistories
                 .Where(x => x.NewShelfProductId == id)
                 .Include(x => x.NewShelfProduct)
                 .ThenInclude(x => x.Shelf)
@@ -229,14 +253,17 @@ namespace DM.Infrastructure.Modules.Movments
                  {
                      FullName = c.UserFullName,
                      ActionDate = c.CreatedAt.Value.ToString("dd/MM/yyyy mm:hh"),
-                     ToShelf = c.NewShelfProduct.Shelf.Name,
-                     FromShelf = c.OldShelfProduct != null ? c.OldShelfProduct.Shelf.Name : "---",
+                     ToShelf = c.AddedQuantity > 0 ? c.NewShelfProduct.Shelf.Name : c.OldShelfProduct.Shelf.Name,
+                     FromShelf = c.AddedQuantity > 0 ? c.OldShelfProduct != null ? c.OldShelfProduct.Shelf.Name : "---" : c.NewShelfProduct.Shelf.Name,
                      NewQantity = c.NewQuantity,
                      OldQuantity = c.OldQuantity,
                      Deferance = c.AddedQuantity,
-                     MovmantType = c.MovmentType.ToString(),
-
+                     MovmentTypeEnum = c.MovmentType,
                  }).ToListAsync();
+
+            foreach (var item in data)
+                item.MovmantType = GetEnumDescription(item.MovmentTypeEnum);
+            return data;
         }
         public async Task<GetDashboradDto> GetDashborad()
         {
@@ -246,7 +273,7 @@ namespace DM.Infrastructure.Modules.Movments
                 DamagedProducts = await _context.ShelfProducts.Where(x => !x.IsDelete && x.Shelf.Exhibition.Type == ExhibitionType.Damaged && x.Quantity != 0).CountAsync(),
                 Exhibitions = await _context.Exhibitions.CountAsync(x => x.Type == ExhibitionType.Exhibition && !x.IsDelete),
                 Users = await _context.Users.CountAsync(x => !x.IsDelete && x.UserType == UserType.Supervisor),
-                FinishedProducts = await _context.ShelfProducts.Where(x => !x.IsDelete && x.Quantity == 0).CountAsync(),
+                FinishedProducts = await _context.Products.Where(x => !x.IsDelete && !x.ShelfProducts.Any(c => c.Quantity > 0 && c.Shelf.Exhibition.Type == ExhibitionType.Exhibition)).CountAsync(),
                 StoreProducts = await _context.Exhibitions.Where(x => !x.IsDelete && x.Type == ExhibitionType.Store).CountAsync(),
             };
         }
@@ -254,7 +281,10 @@ namespace DM.Infrastructure.Modules.Movments
         {
             var skipValue = (input.Page - 1) * input.PerPage;
 
-            return await _context.ShelfProducts.Where(x => (string.IsNullOrEmpty(input.SearchKey)
+            return await _context.ShelfProducts.Where(x =>
+            !x.IsDelete && 
+            x.Shelf.Exhibition.Type != ExhibitionType.Store
+            && (string.IsNullOrEmpty(input.SearchKey)
             || x.Product.Name.Contains(input.SearchKey)
             || x.Product.ProductNo.Contains(input.SearchKey)
             || x.Shelf.Name.Contains(input.SearchKey)
@@ -273,7 +303,42 @@ namespace DM.Infrastructure.Modules.Movments
                 ShelfName = x.Shelf.Name,
                 ShelfNo = x.Shelf.ShelfNo,
                 IsStore = x.Shelf.Exhibition.Type == ExhibitionType.Store,
-            }).OrderByDescending(x=> x.Id).Skip(skipValue).Take(input.PerPage).ToListAsync();
+            }).OrderByDescending(x => x.Id).Skip(skipValue).Take(input.PerPage).ToListAsync();
+        }
+
+        private string GetEnumDescription(MovmentType value)
+        {
+            switch (value)
+            {
+                case MovmentType.AddedMovemnt:
+                    return "Add quantity";
+                case MovmentType.InternalMovment:
+                    return "Transfering to onther shelf";
+                case MovmentType.ExternalMovment:
+                    return "Moving from wearhouse to another";
+                case MovmentType.MoveToStore:
+                    return "Move To Store";
+                case MovmentType.MoveToDamaged:
+                    return "Move To Damaged section";
+                case MovmentType.DeletedMovemnt:
+                    return "Delete quantity";
+                default:
+                    return "";
+
+            }
+        }
+
+        public async Task DeleteProduct(int id)
+        {
+            var Product = await _context.ShelfProducts.FirstOrDefaultAsync(x => x.Id == id);
+            if (Product == null)
+                throw new DMException("Products does't exists");
+            if (Product.IsDelete)
+                throw new DMException("Products already deleted");
+
+            Product.IsDelete = true;
+            _context.ShelfProducts.Update(Product);
+            await _context.SaveChangesAsync();
         }
         #endregion
     }

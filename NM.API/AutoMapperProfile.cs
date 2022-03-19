@@ -20,7 +20,9 @@ namespace NM.API
             CreateMap<CreateUserDto, DMUser>();
 
             CreateMap<Product, CreateProductDto>().ReverseMap();
-            CreateMap<Shelf, CreateShelfDto>().ReverseMap();
+            CreateMap<Shelf, CreateShelfDto>()
+                .ForMember(x=> x.ShelfNo , z=> z.MapFrom(v=> v.ShelfNo.ToString()))
+                .ReverseMap();
             CreateMap<Exhibition, CreateExhibitionDto>().ReverseMap();
 
             CreateMap<Product, ProductDto>().ReverseMap();

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DM.Core.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,8 @@ namespace DM.Core.Movments
         public int NewQuantity { get; set; }
         public int DeferanceQunatity { get; set; }
         public string MovmentType { get; set; }
+        public MovmentType MovmentTypeEnum { get; set; }
+
     }
     public class ProductHistoryReportDto
     {
@@ -27,5 +30,7 @@ namespace DM.Core.Movments
         public int NewQantity { get; set; }
         public int Deferance { get; set; }
         public string MovmantType { get; set; }
+        public MovmentType MovmentTypeEnum { get; set; }
+
     }
 }
