@@ -14,7 +14,7 @@ namespace DM.Infrastructure.Modules.Movments.Reports.ReportsModule
 {
     public class ReportService : IReportService
     {
-        private const string slash = "/";
+        private const string slash = "\\";
         private readonly DMDbContext _context;
         private readonly IWebHostEnvironment environment;
 
@@ -32,13 +32,13 @@ namespace DM.Infrastructure.Modules.Movments.Reports.ReportsModule
                   || x.ProductNo.Contains(searchKey)))
                   .Select(c => new ProductsDto
                   {
-                      Name = c.Name,
-                      Description = c.Description,
-                      Number = c.ProductNo
+                      Name = c.Name ?? "---",
+                      Descrption = c.Description ?? "---",
+                      Number = c.ProductNo ?? "---"
                   }).ToListAsync();
 
             List<ReportParameter> parameters = new List<ReportParameter>();
-            return Print(parameters, "Invoice.rdlc", "Products", products);
+            return Print(parameters, "Products.rdlc", "Products", products);
         }
         public async Task<byte[]> SearchProduct(string searchKey)
         {
@@ -60,7 +60,7 @@ namespace DM.Infrastructure.Modules.Movments.Reports.ReportsModule
            }).ToListAsync();
 
             List<ReportParameter> parameters = new List<ReportParameter>();
-            return Print(parameters, "SearchProduct.rdlc", "SearchProduct", products);
+            return Print(parameters, "SearchProduct.rdlc", "SearchProducts", products);
         }
         public async Task<byte[]> ShelfProducts(int shelfId)
         {
@@ -80,8 +80,7 @@ namespace DM.Infrastructure.Modules.Movments.Reports.ReportsModule
         public async Task<byte[]> WearhouesProducts(int exhibitionId)
         {
             var wearhouse = await _context.Exhibitions.FirstOrDefaultAsync(x => x.Id == exhibitionId);
-            var products = await _context.ShelfProducts
-                                        .Where(x => !x.IsDelete && x.Shelf.ExhibitionId == exhibitionId)
+            var products = await _context.ShelfProducts.Where(x => !x.IsDelete && x.Shelf.ExhibitionId == exhibitionId)
                                         .Select(c => new SearchProductDto
                                         {
                                             Quantity = c.Quantity,
@@ -90,7 +89,7 @@ namespace DM.Infrastructure.Modules.Movments.Reports.ReportsModule
                                         }).ToListAsync();
 
             List<ReportParameter> parameters = new List<ReportParameter>() { new ReportParameter("WearhouseName", wearhouse.Name ?? "---"), new ReportParameter("WearhouseAddress", wearhouse.Address ?? "---") };
-            return Print(parameters, "WearhouesProduct.rdlc", "WearhouesProduct", products);
+            return Print(parameters, "WearhouseProduct.rdlc", "ShelfProduct", products);
         }
         private byte[] Print(List<ReportParameter> parameters, string reportName, string dataSourcsName, object dataSourc)
         {

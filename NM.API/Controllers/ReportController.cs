@@ -15,19 +15,22 @@ namespace NM.API.Controllers
         {
             _reportService = reportService;
         }
-
+        [HttpGet]
         public async Task<IActionResult> SearchProduct(string searchKey)
         {
             return File(await _reportService.SearchProduct(searchKey), "Application/pdf");
         }
+        [HttpGet]
         public async Task<IActionResult> WearhouesProducts(int exhibitionId)
         {
             return File(await _reportService.WearhouesProducts(exhibitionId), "Application/pdf");
         }
+        [HttpGet]
         public async Task<IActionResult> Products(string searchKey)
         {
             return File(await _reportService.Products(searchKey), "Application/pdf");
         }
+        [HttpGet]
         public async Task<IActionResult> ShelfProducts(int shelfId)
         {
             return File(await _reportService.ShelfProducts(shelfId), "Application/pdf");

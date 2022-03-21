@@ -387,7 +387,6 @@
             <Left>0.46429cm</Left>
             <Height>1.87638cm</Height>
             <Width>19.85952cm</Width>
-            <ToolTip>=First(Fields!ShelfNo.Value, "ShelfProduct")</ToolTip>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -574,36 +573,10 @@
       </Page>
     </ReportSection>
   </ReportSections>
-  <ReportParameters>
-    <ReportParameter Name="WearhouseName">
-      <DataType>String</DataType>
-      <Nullable>true</Nullable>
-      <AllowBlank>true</AllowBlank>
-      <Prompt>ReportParameter1</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="WearhouseAddress">
-      <DataType>String</DataType>
-      <Nullable>true</Nullable>
-      <AllowBlank>true</AllowBlank>
-      <Prompt>ReportParameter1</Prompt>
-    </ReportParameter>
-  </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>4</NumberOfColumns>
       <NumberOfRows>2</NumberOfRows>
-      <CellDefinitions>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>0</RowIndex>
-          <ParameterName>WearhouseName</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>1</ColumnIndex>
-          <RowIndex>0</RowIndex>
-          <ParameterName>WearhouseAddress</ParameterName>
-        </CellDefinition>
-      </CellDefinitions>
     </GridLayoutDefinition>
   </ReportParametersLayout>
   <Language>ar-EG</Language>

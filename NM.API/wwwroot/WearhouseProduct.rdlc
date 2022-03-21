@@ -286,7 +286,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!ToShelf.Value</Value>
+                                  <Value>=Fields!ShelfNo.Value</Value>
                                   <Style>
                                     <FontStyle>Normal</FontStyle>
                                     <FontFamily>Cairo</FontFamily>
@@ -386,8 +386,7 @@
             <Top>2.95614cm</Top>
             <Left>0.46432cm</Left>
             <Height>1.87638cm</Height>
-            <Width>19.85954cm</Width>
-            <ToolTip>=First(Fields!ShelfNo.Value, "ShelfProduct")</ToolTip>
+            <Width>19.85952cm</Width>
             <Style>
               <Border>
                 <Style>None</Style>

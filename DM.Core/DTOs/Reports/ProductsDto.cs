@@ -10,6 +10,6 @@ namespace DM.Core.DTOs.Reports
     {
         public string Name { get; set; }
         public string Number { get; set; }
-        public string Description { get; set; }
+        public string Descrption { get; set; }
     }
 }
