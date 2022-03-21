@@ -282,8 +282,7 @@
             <Top>2.00364cm</Top>
             <Left>0.46432cm</Left>
             <Height>1.87638cm</Height>
-            <Width>19.85954cm</Width>
-            <ToolTip>=First(Fields!ShelfNo.Value, "ShelfProduct")</ToolTip>
+            <Width>19.85953cm</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -335,7 +334,7 @@
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>=Parameters!WearhouseName.Value</Value>
+                    <Value>=Parameters!ShelfNo.Value</Value>
                     <Style>
                       <FontFamily>Open Sans</FontFamily>
                       <FontSize>9pt</FontSize>
@@ -456,7 +455,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>Wearhouse Products</Value>
+                      <Value>Shelf Products</Value>
                       <Style>
                         <FontStyle>Normal</FontStyle>
                         <FontFamily>open Sans</FontFamily>
